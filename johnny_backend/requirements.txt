@@ -1,0 +1,10 @@
+# Web Framework
+fastapi
+uvicorn[standard]
+
+# Configuration & Environment
+pydantic-settings
+python-dotenv
+
+# Supabase Client
+supabase

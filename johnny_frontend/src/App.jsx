@@ -105,7 +105,7 @@ const ChatComponent = ({ user }) => {
             setConversationState('idle');
         }
     }, [conversationState]);
-    
+
     // Function to stop speech recognition
     const stopListening = useCallback(() => {
         if (!recognition || conversationState !== 'listening') return;
@@ -162,7 +162,7 @@ const ChatComponent = ({ user }) => {
         setMessages(prev => [...prev, userMessage]);
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/v1/chat/', {
+            const response = await fetch('https://johnny-backend.vercel.app/api/v1/chat/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: transcript, user_id: user.id })
@@ -205,10 +205,10 @@ const ChatComponent = ({ user }) => {
                 processTranscript(finalTranscript.trim());
             }
         };
-        
+
         const handleEnd = () => {
             if (conversationState === 'listening') {
-                 stopListening();
+                stopListening();
             }
         };
 
@@ -226,7 +226,7 @@ const ChatComponent = ({ user }) => {
         if (conversationState === 'listening') {
             stopListening();
         } else if (['idle', 'speaking'].includes(conversationState)) {
-            window.speechSynthesis.cancel(); 
+            window.speechSynthesis.cancel();
             startListening();
         }
     };
@@ -236,13 +236,13 @@ const ChatComponent = ({ user }) => {
         const initialGreeting = "System online. I am ready when you are.";
         setMessages([{ id: 1, text: initialGreeting, sender: 'johnny' }]);
         speak(initialGreeting, () => setConversationState('idle'));
-        
+
         // Cleanup function to stop everything when the component unmounts (e.g., on logout)
         return () => {
             stopListening();
             window.speechSynthesis.cancel();
         }
-    }, [speak, stopListening]); 
+    }, [speak, stopListening]);
 
     return (
         <div className="h-screen w-screen flex flex-col bg-transparent text-text-primary">
@@ -264,7 +264,7 @@ const ChatComponent = ({ user }) => {
                     {messages.map((msg) => (
                         <div key={msg.id} className={`flex items-start gap-3 my-4 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                             <div className={`p-1 rounded-full ${msg.sender === 'user' ? 'bg-accent order-2' : 'bg-gray-600 order-1'}`}>
-                                {msg.sender === 'user' ? <User size={20} className="text-primary"/> : <Code size={20} className="text-accent" />}
+                                {msg.sender === 'user' ? <User size={20} className="text-primary" /> : <Code size={20} className="text-accent" />}
                             </div>
                             <div className={`px-4 py-3 rounded-lg max-w-lg ${msg.sender === 'user' ? 'bg-accent text-primary order-1' : 'bg-primary/80 backdrop-blur-sm border border-border-color order-2'}`}>
                                 <p style={{ whiteSpace: 'pre-wrap' }}>{msg.text}</p>
@@ -289,39 +289,39 @@ const ChatComponent = ({ user }) => {
 // --- Main App Component ---
 // This is the root component that handles session state and renders either the Auth or Chat component.
 function App() {
-  const [session, setSession] = useState(null);
-  const [isAuthReady, setIsAuthReady] = useState(false);
+    const [session, setSession] = useState(null);
+    const [isAuthReady, setIsAuthReady] = useState(false);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setIsAuthReady(true);
-    });
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session);
+            setIsAuthReady(true);
+        });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session);
+        });
 
-    return () => subscription.unsubscribe();
-  }, []);
+        return () => subscription.unsubscribe();
+    }, []);
 
-  // Show a loading indicator until the session is checked to prevent UI flashing.
-  if (!isAuthReady) {
+    // Show a loading indicator until the session is checked to prevent UI flashing.
+    if (!isAuthReady) {
+        return (
+            <div className="w-screen h-screen bg-primary flex justify-center items-center text-accent">
+                <p className="text-2xl">Initializing Systems...</p>
+            </div>
+        );
+    }
+
     return (
-        <div className="w-screen h-screen bg-primary flex justify-center items-center text-accent">
-            <p className="text-2xl">Initializing Systems...</p>
+        <div className="relative w-screen h-screen">
+            <CanvasBackground />
+            <div className="absolute top-0 left-0 w-full h-full">
+                {!session ? <AuthComponent /> : <ChatComponent key={session.user.id} user={session.user} />}
+            </div>
         </div>
     );
-  }
-
-  return (
-    <div className="relative w-screen h-screen">
-        <CanvasBackground />
-        <div className="absolute top-0 left-0 w-full h-full">
-            {!session ? <AuthComponent /> : <ChatComponent key={session.user.id} user={session.user} />}
-        </div>
-    </div>
-  );
 }
 
 export default App;

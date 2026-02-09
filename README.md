@@ -5,6 +5,11 @@
 ![Status](https://img.shields.io/badge/Status-Active-success)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
+## 🌐 Live Demo
+
+- **Frontend**: [https://johnnyfrontend.vercel.app/](https://johnnyfrontend.vercel.app/)
+- **Backend API**: [https://johnnybackend.vercel.app/](https://johnnybackend.vercel.app/)
+
 ## ✨ Features
 
 - **🗣️ Voice Interaction**: Real-time Speech-to-Text (STT) and Text-to-Speech (TTS) using the Web Speech API.
@@ -96,6 +101,24 @@ npm run dev
 2.  Log in using your email (Magic Link).
 3.  Click the **Mic** icon to start speaking to Johnny.
 4.  Johnny will process your voice, query Gemini Pro, and respond back with voice and text!
+
+## ☁️ Deployment
+
+### Deploying to Vercel
+
+1.  **Backend**:
+    - Push the `johnny_backend` folder to a GitHub repository.
+    - Create a new project in Vercel and import the repository.
+    - Set the **Root Directory** to `johnny_backend`.
+    - Add the **Environment Variables** (`SUPABASE_URL`, `SUPABASE_KEY`, `GEMINI_API_KEY`) in the Vercel project settings.
+    - Vercel should automatically detect the `vercel.json` and deploy using the Python runtime.
+
+2.  **Frontend**:
+    - Push the `johnny_frontend` folder to a GitHub repository.
+    - Create a new project in Vercel and import the repository.
+    - Set the **Root Directory** to `johnny_frontend`.
+    - Add the **Environment Variables** (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) in the Vercel project settings.
+    - Vercel will automatically detect the Vite build settings.
 
 ## 🤝 Contributing
 

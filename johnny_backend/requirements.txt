@@ -8,3 +8,6 @@ python-dotenv
 
 # Supabase Client
 supabase
+
+# AI
+google-generativeai

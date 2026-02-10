@@ -1,1 +1,9 @@
-Add-Content .gitignore "node_modules/`nvenv/`n.env`n.DS_Store`n/dist`n/build"
+node_modules/
+venv/
+.env
+.env.local
+.env.*
+
+.DS_Store
+/dist
+/build

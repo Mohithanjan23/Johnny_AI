@@ -28,7 +28,13 @@ const AuthComponent = () => {
         e.preventDefault();
         try {
             setLoading(true);
-            const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+            const { error } = await supabase.auth.signInWithOtp({
+                email,
+                options: {
+                    shouldCreateUser: true,
+                    emailRedirectTo: window.location.origin
+                }
+            });
             if (error) throw error;
             alert('Check your email for the magic login link!');
         } catch (error) {

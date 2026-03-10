@@ -24,42 +24,51 @@ const PulsingMic = ({ state, onClick, analyserNode }) => {
     };
 
     useEffect(() => {
-        if (!analyserNode || !visualizerRef.current || state !== 'listening') {
-            // Clear visualizer if not listening
-            if (visualizerRef.current) {
-                const bars = visualizerRef.current.children;
-                for (let i = 0; i < bars.length; i++) {
-                    bars[i].style.transform = 'scaleY(0.05)';
-                }
-            }
-            return;
-        };
-
+        if (!visualizerRef.current) return;
         const canvas = visualizerRef.current;
-        analyserNode.fftSize = 128;
-        const bufferLength = analyserNode.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
+        const bars = canvas.children;
 
         let animationFrameId;
 
-        const draw = () => {
-            animationFrameId = requestAnimationFrame(draw);
-            analyserNode.getByteFrequencyData(dataArray);
+        if (state === 'speaking') {
+            // Simulate AI speaking waves
+            const simulateSpeech = () => {
+                animationFrameId = requestAnimationFrame(simulateSpeech);
+                for (let i = 0; i < bars.length; i++) {
+                    // Random wave generator
+                    const randomHeight = Math.random() * 0.8 + 0.2;
+                    // Slower transition for a more natural look
+                    bars[i].style.transition = 'transform 0.1s ease-in-out';
+                    bars[i].style.transform = `scaleY(${randomHeight})`;
+                }
+            };
+            simulateSpeech();
+        } else if (state === 'listening' && analyserNode) {
+            analyserNode.fftSize = 128;
+            const bufferLength = analyserNode.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
 
-            const bars = canvas.children;
-            const barCount = bars.length;
+            const drawUserSpeech = () => {
+                animationFrameId = requestAnimationFrame(drawUserSpeech);
+                analyserNode.getByteFrequencyData(dataArray);
 
-            for (let i = 0; i < barCount; i++) {
-                // Scale the data to a 0-1 range, with some emphasis
-                const barHeight = Math.pow(dataArray[i * Math.floor(bufferLength/barCount)] / 255, 2.5);
-                bars[i].style.transform = `scaleY(${Math.max(0.05, barHeight)})`;
+                for (let i = 0; i < bars.length; i++) {
+                    const barHeight = Math.pow(dataArray[i * Math.floor(bufferLength/bars.length)] / 255, 2.5);
+                    bars[i].style.transition = 'transform 0.05s ease-out';
+                    bars[i].style.transform = `scaleY(${Math.max(0.05, barHeight)})`;
+                }
+            };
+            drawUserSpeech();
+        } else {
+            // Reset state
+            for (let i = 0; i < bars.length; i++) {
+                bars[i].style.transition = 'transform 0.3s ease-out';
+                bars[i].style.transform = 'scaleY(0.05)';
             }
-        };
-
-        draw();
+        }
 
         return () => {
-            cancelAnimationFrame(animationFrameId);
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
         };
     }, [analyserNode, state]);
 
